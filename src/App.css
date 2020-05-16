@@ -12,3 +12,11 @@ header{
 nav{
 	margin-bottom: 20px;
 }
+form{
+	display:flex;
+	flex-direction: column;
+}
+.div-login-register-switch{
+	display:flex;
+	justify-content: center;
+}
