@@ -25,6 +25,8 @@ export default class App extends Component{
       loggedInUsername: '',
       showLogin: true,
       showRegister: false,
+      showLoginRegisterContainer: true,
+      showEventsContainer: false,
     }
   }
 
@@ -127,8 +129,14 @@ export default class App extends Component{
       console.log("registerJson",registerJson)
       if(registerResponse.status === 201){
         this.setState({
-          loggedIn:true,
-          loggedInUsername: registerJson.data.username
+          loggedIn: true,
+          loggedInUsername: registerJson.data.username,
+          showLoginRegisterContainer: false,
+          username:"",
+          email:"",
+          password:"",
+          state:"",
+          city:"",
         })
       }
     }catch(err){
@@ -155,7 +163,14 @@ export default class App extends Component{
       if(loginResponse.status === 200){
         this.setState({
           loggedIn: true,
-          loggedInUsername: loginJson.data.username
+          loggedInUsername: loginJson.data.username,
+          showLogin: false,
+          showLoginRegisterContainer: false,
+          username:"",
+          email:"",
+          password:"",
+          state:"",
+          city:"",
         })
       }
     } catch(err){
@@ -163,9 +178,16 @@ export default class App extends Component{
     }
   }
 
+  switchToEvents =()=>{
+    this.setState({
+          showLogin: false,
+          showLoginRegisterContainer: false,
+    })
+  }
+
   logout = async () => {
     try {
-      const url = process.env.REACT_APP_API_URL + "/api/v1/creators/logout"
+      const url = process.env.REACT_APP_API_URL + "/api/v1/users/logout"
       const logoutResponse = await fetch(url, {
         credentials: 'include'
       })
@@ -175,8 +197,22 @@ export default class App extends Component{
 
       if(logoutResponse.status === 200){
         this.setState({
+          eventsPage:false,
+          myPage:false,
+          settings:false,
+          username:"",
+          email:"",
+          password:"",
+          state:"",
+          city:"",
+          picture:"http://icons.iconarchive.com/icons/papirus-team/papirus-status/256/avatar-default-icon.png",
           loggedIn: false,
-          loggedInUsername: ''
+          loggedInUsername: '',
+          showLogin: true,
+          showRegister: false,
+          showLoginRegisterContainer: true,
+          showEventsContainer: false,
+
         })
       }
     }catch(err){
@@ -191,21 +227,31 @@ export default class App extends Component{
     return (
       <div className="TheApp">
         <header>
-          <h1>HOBBY CROWD</h1>
+          <h1 className="HOBBYCROWD">HOBBY CROWD</h1>
+          {
+            this.state.loggedInUsername
+            &&
+            <h2>Welcome Back! Logged in as {this.state.loggedInUsername}</h2>
+          }
+          
         </header>
         {
-
-          (this.loggedIn)
-          ?
-          <React.Fragmant>
-            <NavBar />
+          (this.state.loggedIn)
+          &&
+          <div>
+            <NavBar 
+              logout={this.logout}
+            />
             <h3>EventContainer</h3>
             <EventContainer 
               allEvents={this.state.events} 
             />
-          </React.Fragmant>
-          :
-          <div>
+          </div>
+        }
+        {
+          this.state.showLoginRegisterContainer
+          &&
+          <div className="div-login-register-container">
             <div className="div-login-register-switch"> 
               <div 
                 className="div-loginbutton"

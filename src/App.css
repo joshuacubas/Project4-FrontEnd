@@ -1,6 +1,7 @@
 .TheApp {
   text-align: center;
   width:800px;
+  margin:0 auto;
 }
 header{
   border-bottom: solid black 5px;
@@ -8,7 +9,16 @@ header{
 .nav-fake-links{
   margin:10px 10px;
   color:blue;
+  text-decoration: underline;
+  font-size: 25px;
 }
+
+.nav-fake-links:hover{
+	/*font-size: 150%;*/
+	color:blue;
+	background-color: yellow;
+}
+
 nav{
 	margin-bottom: 20px;
 }
@@ -19,4 +29,7 @@ form{
 .div-login-register-switch{
 	display:flex;
 	justify-content: center;
+}
+.HOBBYCROWD{
+	font-size: 80px;
 }
