@@ -12,8 +12,18 @@ export default class NavBar extends Component{
 		return(
 			<div className="navbar">
 	            <nav>
-	              <span className="nav-fake-links">Events</span> | 
-	              <span className="nav-fake-links">My Page</span> | 
+	              <span 
+	              	className="nav-fake-links"
+	              	onClick={this.props.switchToEvents}
+	              >
+	              	Events
+	              </span> | 
+	              <span 
+	              	className="nav-fake-links"
+	              	onClick={this.props.switchToMyPage}
+	              >
+	              	My Page
+	              </span> | 
 	              <span className="nav-fake-links">Settings</span> | 
 	              <span 
 	              	className="nav-fake-links"

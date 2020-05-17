@@ -3,6 +3,7 @@ import './App.css';
 import EventContainer from './EventContainer/index.js'
 // import LoginRegisterForm from './LoginRegisterForm/index.js'
 import NavBar from './NavBar/index.js'
+import MyPageContainer from './MyPageContainer/index.js'
 
 // import { render } from "react-dom";
 import 'react-responsive-modal/styles.css';
@@ -15,6 +16,7 @@ export default class App extends Component{
     super(props)
     this.state={
       events: [],
+      myOrganizedEvents:[],
       username:"",
       email:"",
       password:"",
@@ -26,7 +28,9 @@ export default class App extends Component{
       showLogin: true,
       showRegister: false,
       showLoginRegisterContainer: true,
-      showEventsContainer: false,
+      showEventsPage:false,
+      showMyPage:false,
+      showSettings:false,
     }
   }
 
@@ -41,6 +45,28 @@ export default class App extends Component{
   //       events:eventsArr
   //     })
   // }
+
+  switchToEvents = () => {
+    this.setState({
+      showLogin: false,
+      showRegister: false,
+      showLoginRegisterContainer: false,
+      showEventsPage:true,
+      showMyPage:false,
+      showSettings:false,
+    })
+  }
+
+  switchToMyPage = () => {
+    this.setState({
+      showLogin: false,
+      showRegister: false,
+      showLoginRegisterContainer: false,
+      showEventsPage:false,
+      showMyPage:true,
+      showSettings:false,
+    })
+  }
 
   switchFormToLogin = () => {
     this.setState({
@@ -58,7 +84,6 @@ export default class App extends Component{
 
   handleSubmit = (event)=>{
     event.preventDefault()
-    console.log(event)
     if(this.state.showLogin){
       this.login({
         email:this.state.email,
@@ -93,6 +118,23 @@ export default class App extends Component{
 
   componentDidMount(){
     this.getEvents()
+  }
+
+  getMyOrganizedEvents = async () => {
+    try {
+      const url = process.env.REACT_APP_API_URL + "/api/v1/events/manage/myevents"
+      const myOrganizedEventsResponse = await fetch (url , {
+        credentials:"include",
+        method:"GET",
+      })
+      //console.log("myOrganizedEventsResponse",myOrganizedEventsResponse)
+      const getMyOrganizedEventsJson = await myOrganizedEventsResponse.json()
+      console.log("getMyOrganizedEventsJson",getMyOrganizedEventsJson)
+      this.setState({myOrganizedEvents:getMyOrganizedEventsJson.data})
+    }
+    catch(err){
+      console.error("error getting my organized events")
+    }
   }
 
   getEvents = async () => {
@@ -130,6 +172,7 @@ export default class App extends Component{
       if(registerResponse.status === 201){
         this.setState({
           loggedIn: true,
+          showEventsPage:true,
           loggedInUsername: registerJson.data.username,
           showLoginRegisterContainer: false,
           username:"",
@@ -138,6 +181,7 @@ export default class App extends Component{
           state:"",
           city:"",
         })
+        
       }
     }catch(err){
       console.error("error trying to register w/ api", err)
@@ -163,6 +207,7 @@ export default class App extends Component{
       if(loginResponse.status === 200){
         this.setState({
           loggedIn: true,
+          showEventsPage:true,
           loggedInUsername: loginJson.data.username,
           showLogin: false,
           showLoginRegisterContainer: false,
@@ -172,17 +217,11 @@ export default class App extends Component{
           state:"",
           city:"",
         })
+        this.getMyOrganizedEvents()
       }
     } catch(err){
       console.error("error trying to login, app.js",err)
     }
-  }
-
-  switchToEvents =()=>{
-    this.setState({
-          showLogin: false,
-          showLoginRegisterContainer: false,
-    })
   }
 
   logout = async () => {
@@ -196,10 +235,7 @@ export default class App extends Component{
       console.log("logoutJson",logoutJson)
 
       if(logoutResponse.status === 200){
-        this.setState({
-          eventsPage:false,
-          myPage:false,
-          settings:false,
+        this.setState({ 
           username:"",
           email:"",
           password:"",
@@ -211,7 +247,9 @@ export default class App extends Component{
           showLogin: true,
           showRegister: false,
           showLoginRegisterContainer: true,
-          showEventsContainer: false,
+          showEventsPage: false,
+          showMyPage:false,
+          showSettings:false,
 
         })
       }
@@ -222,8 +260,9 @@ export default class App extends Component{
 
   
   render(){
-    console.log("process.env",process.env)
-    console.log('this.state.events',this.state.events)
+
+ 
+    console.log("lol",this.state.myOrganizedEvents)
     return (
       <div className="TheApp">
         <header>
@@ -236,17 +275,30 @@ export default class App extends Component{
           
         </header>
         {
-          (this.state.loggedIn)
+          this.state.loggedIn
+          &&
+          <NavBar 
+            logout={this.logout}
+            switchToMyPage={this.switchToMyPage}
+            switchToEvents={this.switchToEvents}
+          />
+        }
+        {
+          (this.state.showEventsPage)
           &&
           <div>
-            <NavBar 
-              logout={this.logout}
-            />
-            <h3>EventContainer</h3>
             <EventContainer 
               allEvents={this.state.events} 
             />
           </div>
+        }
+        {
+          (this.state.showMyPage)
+          &&
+          <MyPageContainer 
+            myOrganizedEvents={this.state.myOrganizedEvents}
+
+          />
         }
         {
           this.state.showLoginRegisterContainer
